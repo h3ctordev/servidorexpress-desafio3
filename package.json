@@ -1,0 +1,12 @@
+{
+  "name": "desafio3",
+  "version": "1.0.0",
+  "description": "Servidor con express",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon ./",
+    "serve": "node ./"
+  },
+  "author": "Hector Bustos",
+  "license": "ISC"
+}
