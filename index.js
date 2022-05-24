@@ -14,9 +14,7 @@ const random = (min, max) => {
 };
 
 app.get("/", (req, res) => {
-  res
-    .status(200)
-    .send("Las rutas definidas son: </productos> </productoRandom'>");
+  res.status(200).send("Las rutas definidas son: /productos /productoRandom");
 });
 
 app.get("/productos", async (req, res) => {

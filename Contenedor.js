@@ -3,13 +3,22 @@ const fs = require("fs");
 module.exports = class Contenedor {
   constructor(file) {
     this.file = file;
-    this.path = `./${this.file}`;
   }
+
+  async exists(path) {
+    try {
+      await fs.promises.access(path);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   async save(object) {
     let completeObj;
     try {
-      if (await fs.existsSync(this.path)) {
-        completeObj = await fs.readFileSync(this.path, "utf-8");
+      if (await this.exists(this.file)) {
+        completeObj = await fs.promises.readFile(this.file, "utf-8");
         completeObj = JSON.parse(completeObj);
 
         // Se toma encuenta el ultimo objeto para geenrar el id y que no se repetitan.
@@ -25,12 +34,15 @@ module.exports = class Contenedor {
 
         completeObj.push(objToSave);
 
-        await fs.writeFileSync(this.path, JSON.stringify(completeObj, null, 2));
+        await fs.promises.writeFile(
+          this.file,
+          JSON.stringify(completeObj, null, 2)
+        );
         return objToSave.id;
       } else {
         const objToSave = { id: 1, ...object };
-        await fs.appendFileSync(
-          this.path,
+        await fs.promises.appendFile(
+          this.file,
           JSON.stringify([objToSave], null, 2)
         );
         return objToSave.id;
@@ -41,8 +53,8 @@ module.exports = class Contenedor {
   }
   async getById(id) {
     try {
-      if (await fs.existsSync(this.path)) {
-        const objects = await fs.readFileSync(this.path, "utf-8");
+      if (await this.exists(this.file)) {
+        const objects = await fs.promises.readFile(this.file, "utf-8");
         const objectsParse = JSON.parse(objects);
         return objectsParse.find((o) => o.id === id) || null;
       } else {
@@ -54,12 +66,12 @@ module.exports = class Contenedor {
   }
   async getAll() {
     try {
-      if (await fs.existsSync(this.path)) {
-        const objects = await fs.readFileSync(this.path, "utf-8");
+      if (await this.exists(this.file)) {
+        const objects = await fs.promises.readFile(this.file, "utf-8");
         const objectsParse = JSON.parse(objects);
         return objectsParse;
       } else {
-        return null;
+        return [];
       }
     } catch (error) {
       throw error;
@@ -68,12 +80,15 @@ module.exports = class Contenedor {
   async deleteById(id) {
     let completeObj;
     try {
-      if (await fs.existsSync(this.path)) {
-        completeObj = await fs.readFileSync(this.path, "utf-8");
+      if (await this.exists(this.file)) {
+        completeObj = await fs.promises.readFile(this.file, "utf-8");
         completeObj = JSON.parse(completeObj);
         completeObj = completeObj.filter((o) => +o.id !== +id);
 
-        await fs.writeFileSync(this.path, JSON.stringify(completeObj, null, 2));
+        await fs.promises.writeFile(
+          this.file,
+          JSON.stringify(completeObj, null, 2)
+        );
       }
     } catch (error) {
       throw error;
@@ -81,8 +96,8 @@ module.exports = class Contenedor {
   }
   async deleteAll() {
     try {
-      if (await fs.existsSync(this.path)) {
-        await fs.writeFileSync(this.path, JSON.stringify([], null, 2));
+      if (await this.exists(this.file)) {
+        await fs.promises.writeFile(this.file, JSON.stringify([], null, 2));
       }
     } catch (error) {
       throw error;
